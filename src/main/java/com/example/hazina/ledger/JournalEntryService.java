@@ -155,6 +155,17 @@ public class JournalEntryService {
         return balance != null ? balance : BigDecimal.ZERO;
     }
 
+    public BigDecimal getAccountBalanceInPeriod(UUID accountId, LocalDate from, LocalDate to) {
+        LocalDate effectiveTo   = to   != null ? to   : LocalDate.now();
+        LocalDate effectiveFrom = from != null ? from : effectiveTo.withDayOfYear(1);
+        BigDecimal balance = lineRepository.getNetBalanceForAccountInPeriod(accountId, effectiveFrom, effectiveTo);
+        return balance != null ? balance : BigDecimal.ZERO;
+    }
+
+    public List<Object[]> sumDebitCreditPerAccount() {
+        return lineRepository.sumDebitCreditPerAccount();
+    }
+
     public List<AccountTransactionResponse> getAccountTransactions(UUID accountId, LocalDate from, LocalDate to) {
         if (!accountRepository.existsById(accountId)) {
             throw new ResourceNotFoundException("Account not found: " + accountId);

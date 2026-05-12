@@ -27,4 +27,22 @@ public interface JournalEntryLineRepository extends JpaRepository<JournalEntryLi
            "AND l.journalEntry.status IN (com.example.hazina.ledger.JournalEntry.EntryStatus.POSTED, " +
            "                              com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED)")
     BigDecimal getNetBalanceForAccount(@Param("accountId") UUID accountId);
+
+    @Query("SELECT COALESCE(SUM(l.debitAmount) - SUM(l.creditAmount), 0) " +
+           "FROM JournalEntryLine l WHERE l.accountId = :accountId " +
+           "AND l.journalEntry.status IN (com.example.hazina.ledger.JournalEntry.EntryStatus.POSTED, " +
+           "                              com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED) " +
+           "AND l.journalEntry.entryDate >= :from AND l.journalEntry.entryDate <= :to")
+    BigDecimal getNetBalanceForAccountInPeriod(
+            @Param("accountId") UUID accountId,
+            @Param("from") LocalDate from,
+            @Param("to") LocalDate to);
+
+    @Query("SELECT l.accountId, " +
+           "COALESCE(SUM(l.debitAmount), 0), COALESCE(SUM(l.creditAmount), 0) " +
+           "FROM JournalEntryLine l " +
+           "WHERE l.journalEntry.status IN (com.example.hazina.ledger.JournalEntry.EntryStatus.POSTED, " +
+           "                                com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED) " +
+           "GROUP BY l.accountId")
+    List<Object[]> sumDebitCreditPerAccount();
 }
