@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: hazina-db
+    environment:
+      POSTGRES_DB: hazina
+      POSTGRES_USER: hazina_user
+      POSTGRES_PASSWORD: hazina_pass
+    ports:
+      - "5433:5432"
+    volumes:
+      - hazina_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hazina_user -d hazina"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  hazina_data:
