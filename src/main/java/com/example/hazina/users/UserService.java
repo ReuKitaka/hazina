@@ -1,9 +1,13 @@
 package com.example.hazina.users;
 
 import com.example.hazina.auth.dto.RegisterRequest;
+import com.example.hazina.users.dto.UserResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -27,5 +31,16 @@ public class UserService {
         }
 
         return userRepository.save(user);
+    }
+
+    public List<UserResponse> findAll() {
+        return userRepository.findAll().stream().map(UserResponse::from).toList();
+    }
+
+    public UserResponse toggleActive(UUID id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("User not found: " + id));
+        user.setActive(!user.isActive());
+        return UserResponse.from(userRepository.save(user));
     }
 }
