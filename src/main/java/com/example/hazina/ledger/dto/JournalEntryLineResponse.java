@@ -11,5 +11,8 @@ public record JournalEntryLineResponse(
         String description,
         BigDecimal debitAmount,
         BigDecimal creditAmount,
-        int lineOrder
+        int lineOrder,
+        String foreignCurrency,
+        BigDecimal foreignAmount,
+        BigDecimal exchangeRate
 ) {}

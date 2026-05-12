@@ -37,4 +37,13 @@ public class JournalEntryLine {
 
     @Column(name = "line_order", nullable = false)
     private int lineOrder;
+
+    @Column(name = "foreign_currency", length = 3)
+    private String foreignCurrency;
+
+    @Column(name = "foreign_amount", precision = 19, scale = 4)
+    private BigDecimal foreignAmount;
+
+    @Column(name = "exchange_rate", precision = 19, scale = 6)
+    private BigDecimal exchangeRate;
 }

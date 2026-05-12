@@ -59,6 +59,9 @@ public class JournalEntryService {
             line.setDebitAmount(lr.debitAmount() != null ? lr.debitAmount() : BigDecimal.ZERO);
             line.setCreditAmount(lr.creditAmount() != null ? lr.creditAmount() : BigDecimal.ZERO);
             line.setLineOrder(i);
+            line.setForeignCurrency(lr.foreignCurrency());
+            line.setForeignAmount(lr.foreignAmount());
+            line.setExchangeRate(lr.exchangeRate());
             lines.add(line);
         }
         entry.setLines(lines);
@@ -166,6 +169,16 @@ public class JournalEntryService {
         return lineRepository.sumDebitCreditPerAccount();
     }
 
+    public BigDecimal getFunctionalBalanceForForeignCurrency(UUID accountId, String currency) {
+        BigDecimal b = lineRepository.getFunctionalBalanceForForeignCurrency(accountId, currency);
+        return b != null ? b : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getNetForeignAmountForAccount(UUID accountId, String currency) {
+        BigDecimal b = lineRepository.getNetForeignAmountForAccount(accountId, currency);
+        return b != null ? b : BigDecimal.ZERO;
+    }
+
     public List<AccountTransactionResponse> getAccountTransactions(UUID accountId, LocalDate from, LocalDate to) {
         if (!accountRepository.existsById(accountId)) {
             throw new ResourceNotFoundException("Account not found: " + accountId);
@@ -244,7 +257,10 @@ public class JournalEntryService {
                             l.getDescription(),
                             l.getDebitAmount(),
                             l.getCreditAmount(),
-                            l.getLineOrder()
+                            l.getLineOrder(),
+                            l.getForeignCurrency(),
+                            l.getForeignAmount(),
+                            l.getExchangeRate()
                     );
                 })
                 .toList();

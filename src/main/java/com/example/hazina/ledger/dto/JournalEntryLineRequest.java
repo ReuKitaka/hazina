@@ -9,5 +9,12 @@ public record JournalEntryLineRequest(
         @NotNull UUID accountId,
         String description,
         BigDecimal debitAmount,
-        BigDecimal creditAmount
-) {}
+        BigDecimal creditAmount,
+        String foreignCurrency,
+        BigDecimal foreignAmount,
+        BigDecimal exchangeRate
+) {
+    public JournalEntryLineRequest(UUID accountId, String description, BigDecimal debitAmount, BigDecimal creditAmount) {
+        this(accountId, description, debitAmount, creditAmount, null, null, null);
+    }
+}

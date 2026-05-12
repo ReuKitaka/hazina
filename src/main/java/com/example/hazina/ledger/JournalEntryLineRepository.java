@@ -45,4 +45,24 @@ public interface JournalEntryLineRepository extends JpaRepository<JournalEntryLi
            "                                com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED) " +
            "GROUP BY l.accountId")
     List<Object[]> sumDebitCreditPerAccount();
+
+    @Query("SELECT COALESCE(SUM(l.debitAmount) - SUM(l.creditAmount), 0) " +
+           "FROM JournalEntryLine l WHERE l.accountId = :accountId " +
+           "AND l.foreignCurrency = :currency " +
+           "AND l.journalEntry.status IN (com.example.hazina.ledger.JournalEntry.EntryStatus.POSTED, " +
+           "                              com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED)")
+    BigDecimal getFunctionalBalanceForForeignCurrency(
+            @Param("accountId") UUID accountId,
+            @Param("currency") String currency);
+
+    @Query("SELECT COALESCE(" +
+           "  SUM(CASE WHEN l.debitAmount > 0 THEN l.foreignAmount ELSE 0 END) - " +
+           "  SUM(CASE WHEN l.creditAmount > 0 THEN l.foreignAmount ELSE 0 END), 0) " +
+           "FROM JournalEntryLine l WHERE l.accountId = :accountId " +
+           "AND l.foreignCurrency = :currency " +
+           "AND l.journalEntry.status IN (com.example.hazina.ledger.JournalEntry.EntryStatus.POSTED, " +
+           "                              com.example.hazina.ledger.JournalEntry.EntryStatus.REVERSED)")
+    BigDecimal getNetForeignAmountForAccount(
+            @Param("accountId") UUID accountId,
+            @Param("currency") String currency);
 }
