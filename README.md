@@ -2,6 +2,8 @@
 
 **Hazina** (Swahili for *Treasury*) is a modular, double-entry accounting system built with Spring Boot 4, Java 21, and PostgreSQL. Every financial transaction posts a balanced journal entry to the General Ledger — debits always equal credits.
 
+**Frontend:** The Next.js 15 web app lives at [github.com/ReuKitaka/hazina-web](https://github.com/ReuKitaka/hazina-web).
+
 ---
 
 ## Table of Contents
@@ -89,11 +91,28 @@ PostgreSQL starts on port **5433** (5432 is left free for any local installation
 
 Flyway runs all migrations automatically on startup. The app starts on `http://localhost:8080`.
 
-### 3. Open Swagger UI
+### 3. Start everything with one command
+
+A convenience script starts Docker, the backend, and the frontend in the correct order:
+
+```bash
+# Start all three services
+./scripts/dev.sh
+
+# Check what's running
+./scripts/dev.sh status
+
+# Stop everything
+./scripts/dev.sh stop
+```
+
+The script expects the frontend repo (`hazina-web`) to be in the same parent directory as this repo.
+
+### 4. Open Swagger UI
 
 Navigate to `http://localhost:8080/swagger-ui/index.html` — all endpoints are listed and interactive. Obtain a token from `POST /api/auth/login`, click **Authorize**, and paste it.
 
-### 4. Register the first user
+### 5. Register the first user
 
 ```bash
 curl -X POST http://localhost:8080/api/auth/register \
@@ -128,9 +147,9 @@ Available roles: `ADMIN`, `ACCOUNTANT`, `VIEWER`.
 
 ## Modules
 
-### 1. Authentication
+### 1. Authentication & User Management
 
-**Base path:** `/api/auth`
+**Base path:** `/api/auth`, `/api/users`
 
 Stateless JWT authentication. Tokens are signed with HS512 and expire after 24 hours.
 
@@ -149,6 +168,13 @@ Stateless JWT authentication. Tokens are signed with HS512 and expire after 24 h
 ```
 
 Include the token in subsequent requests: `Authorization: Bearer <token>`
+
+**User management endpoints (ADMIN only):**
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | `/api/users` | List all users |
+| PATCH | `/api/users/{id}/toggle-active` | Activate or deactivate a user |
 
 ---
 
